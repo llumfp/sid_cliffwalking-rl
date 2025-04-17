@@ -7,8 +7,8 @@ This project explores and compares different reinforcement learning algorithms o
 The project is organized as follows:
 
 ### Main Components
-- `execution.py`: Main execution script for running the experiments
-- `experimentation.py`: Contains the experimentation setup and configuration
+- `execution.py`: Main execution script for running the experiments. It has a loop for different parameters settings, execution script `experimentation.py` many times.
+- `experimentation.py`: Contains the experimentation setup and configuration for differents parameters with argparse.
 - `analyze_results.py`: Script for analyzing and visualizing the results
 
 ### Algorithms (`/algorithms`)
