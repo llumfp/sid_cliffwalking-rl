@@ -131,6 +131,7 @@ T_MAX = 400
 LEARNING_RATE = 0.01
 LEARNING_RATE_DECAY = 0.995
 
+
 env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=False)
 env = RewardWrapper(env)
 
