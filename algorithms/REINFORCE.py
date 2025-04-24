@@ -14,9 +14,9 @@ class RewardWrapper(gym.RewardWrapper):
     def step(self, action):
         state, reward, done, truncated, info = self.env.step(action)
         reward = reward if state != 47 else 0
-        if reward == -100:
+        """if reward == -100:
             done = True
-        done = done or truncated
+        done = done or truncated"""
         
         return state, reward, done, done, info
 
@@ -95,12 +95,16 @@ class ReinforceAgent:
             policy[s] = np.argmax(action_probabilities)
         return policy, self.policy_table
     
-def draw_history(history, title):
-    average_rewards = [np.mean(history[i:i + 100]) for i in range(0, len(history), 100)]
+def draw_history(history, title, split=200):
+    average_rewards = [np.mean(history[i:i + split]) for i in range(0, len(history), split)]
+    std_rewards = [np.std(history[i:i + split]) for i in range(0, len(history), split)]
+    lower_bound = [avg - std for avg, std in zip(average_rewards, std_rewards)]
+    upper_bound = [avg + std for avg, std in zip(average_rewards, std_rewards)]
     plt.figure(figsize=(10, 6))
+    plt.fill_between(range(1, len(average_rewards) + 1), lower_bound, upper_bound, color='b', alpha=0.2, label='±1 Std Dev')
     plt.plot(range(1, len(average_rewards) + 1), average_rewards, marker='o', linestyle='-')
-    plt.title('Average ' + title + ' Every 50 Episodes')
-    plt.xlabel('Episode Group (100 episodes each)')
+    plt.title(f'Average {title} Every {split} Episodes')
+    plt.xlabel(f'Episode Group ({split} episodes each)')
     plt.ylabel('Average ' + title)
     plt.grid(True)
     plt.tight_layout()
@@ -125,7 +129,7 @@ def revert_state_to_row_col(state):
 
 # Declaración de constantes
 SLIPPERY = True
-TRAINING_EPISODES = 15000
+TRAINING_EPISODES = 4000 #15000
 GAMMA = 0.75
 T_MAX = 400
 LEARNING_RATE = 0.01
@@ -155,21 +159,7 @@ print_policy(policy)
 draw_history(rewards, "Reward")
 draw_history(losses, "Loss")
 
-
-"""best_actions = [0,1,1,1,1,1,1,1,2,1,1,1,2,2, 2]
-env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=False)
-env = RewardWrapper(env)
-
-state, _ = env.reset()
-for i in range(len(best_actions)):
-    action = best_actions[i]
-    next_state, reward, done, terminated, _ = env.step(action)
-    print(f"State: {state}, Action: {action}, Next state: {next_state}, Reward: {reward}, Done: {done}, Terminated: {terminated}")
-    state = next_state
-    if done or terminated:
-        break"""
-
-env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=True)
+"""env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=True)
 
 state, _ = env.reset()
 done = False
@@ -184,6 +174,6 @@ while not done and step < agent.T_MAX:
     total_reward += reward
     step += 1
 env.close()
-print(f"Total reward after rendering: {total_reward}")
+print(f"Total reward after rendering: {total_reward}")"""
 
 #draw_history(losses, "Loss")
