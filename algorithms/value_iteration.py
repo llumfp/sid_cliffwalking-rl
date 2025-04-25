@@ -14,7 +14,7 @@ class ValueIteration:
         self.num_episodes = num_episodes
         self.t_max = t_max
         self.reward_threshold = reward_threshold
-        self.terminal_state = [47, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
+        self.terminal_state = [47]
         
     def calc_action_value(self, state, action):
         action_value = sum([prob * (reward + self.gamma * self.V[next_state])
@@ -37,6 +37,7 @@ class ValueIteration:
         for state in range(self.env.observation_space.n):
             if state in self.terminal_state:
                 continue
+
             state_values = []
             for action in range(self.env.action_space.n):  
                 state_values.append(self.calc_action_value(state, action))
@@ -87,6 +88,8 @@ class ValueIteration:
             if reward_test > best_reward:
                 print(f"Best reward updated {reward_test:.2f} at iteration {t}") 
                 best_reward = reward_test
+                
+            print_policy(self.policy())
         
         return rewards, max_diffs
     
@@ -121,11 +124,25 @@ def draw_rewards(rewards):
     plt.show()
 
 
+class CustomFrozenLakeWrapper(gym.Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+    
+    def step(self, action):
+        state, reward, is_done, truncated, info = self.env.step(action)
+        
+        if state in [47]:
+            is_done = True
+        
+        return state, reward, is_done, is_done, info
+
+
 env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+env = CustomFrozenLakeWrapper(env)
 
 GAMMA = 0.9999
 NUM_EPISODES = 200
-T_MAX = 50
+T_MAX = 100
 
 agent = ValueIteration(env, gamma=GAMMA, num_episodes=NUM_EPISODES, t_max=T_MAX, reward_threshold=-20)
 rewards, max_diffs = agent.train()
