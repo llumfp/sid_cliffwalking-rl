@@ -3,7 +3,7 @@ import gymnasium as gym
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import time
 """ CliffWalking-v1"""
 
 
@@ -14,9 +14,9 @@ class RewardWrapper(gym.RewardWrapper):
     def step(self, action):
         state, reward, done, truncated, info = self.env.step(action)
         reward = reward if state != 47 else 0
-        """if reward == -100:
+        
+        if state in [37, 38, 39, 40, 41, 42, 43, 44, 45, 46]:
             done = True
-        done = done or truncated"""
         
         return state, reward, done, done, info
 
@@ -77,6 +77,11 @@ class ReinforceAgent:
         while not done and step < self.T_MAX:
             action = self.select_action(state)
             next_state, reward, done, terminated, _ = self.env.step(action)
+            #print(f"State: {state}, Action: {action}, Next State: {next_state}, Reward: {reward}, Done: {done}")
+            if reward != -1:
+                done = True
+                
+
             done = done or terminated
             #reward = reward if reward != -100 else -10
             episode.append((state, action, reward))
@@ -84,8 +89,10 @@ class ReinforceAgent:
             total_reward = total_reward + reward
             step = step + 1
             meta = meta + 1 if next_state == 47 else meta
+            if done:
+                break
         loss = self.update_policy(zip(*episode))
-        self.learning_rate = self.learning_rate * self.lr_decay #if self.learning_rate > 0.001 else self.learning_rate
+        self.learning_rate = self.learning_rate * self.lr_decay if self.learning_rate > 0.0001 else self.learning_rate
         return total_reward, loss, meta
 
     def policy(self):
@@ -129,15 +136,15 @@ def revert_state_to_row_col(state):
 
 # Declaración de constantes
 SLIPPERY = True
-TRAINING_EPISODES = 4000 #15000
+TRAINING_EPISODES = 15000
 GAMMA = 0.75
 T_MAX = 400
 LEARNING_RATE = 0.01
 LEARNING_RATE_DECAY = 0.995
 
 
-env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=False)
-env = RewardWrapper(env)
+env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+#env = RewardWrapper(env)
 
 agent = ReinforceAgent(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
                        lr_decay=LEARNING_RATE_DECAY, seed=0, t_max=T_MAX)
