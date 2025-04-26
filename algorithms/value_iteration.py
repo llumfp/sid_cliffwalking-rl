@@ -3,10 +3,10 @@ import gymnasium as gym
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import time
+import time 
 
 class ValueIteration:
-    def __init__(self, env: gym.Env, gamma:float=0.9, num_episodes:int=1000, t_max:int=100, reward_threshold:float=50):
+    def __init__(self, env: gym.Env, gamma:float=0.9, num_episodes:int=1000, t_max:int=100, reward_threshold:float=-60):
         self.env = env
         self.V = np.zeros(self.env.observation_space.n)
         self.V[47] = 10
@@ -76,78 +76,62 @@ class ValueIteration:
         max_diffs = []
         t = 0
         best_reward = -1000
+        ready_to_compare = False
         
-        while len(max_diffs) < 1 or max_diff > 0.0001:
+        init_time = time.time()
+        
+        while not ready_to_compare or abs(max_diffs[-2] - max_diffs[-1]) > 0.01:
             _, max_diff = self.value_iteration()
+            #print(f"Iteration {t}, max_diff = " + str(max_diff))
             max_diffs.append(max_diff)
             t += 1
             reward_test = self.check_improvements()
-            print(f"After value iteration,reward_test of {reward_test}, max_diff = " + str(max_diff))
+            print(f"Iteration {t}, reward_test of {reward_test}, max_diff = " + str(max_diff))
             rewards.append(reward_test)
                 
             if reward_test > best_reward:
-                print(f"Best reward updated {reward_test:.2f} at iteration {t}") 
+                #print(f"Best reward updated {reward_test:.2f} at iteration {t}") 
                 best_reward = reward_test
                 
-            print_policy(self.policy())
+            #self.print_policy(self.policy())
+            
+            if len(max_diffs) > 1:
+                ready_to_compare = True
+        
+        end_time = time.time() - init_time
+        #self.draw_rewards(rewards)
+        print(f"SOLUCION: value_iteration, {self.num_episodes}, {self.gamma}, 0, 0, {t}, {best_reward}, {end_time:.2f}")
         
         return rewards, max_diffs
     
     
-def print_policy(policy):
-    visual_help = {0: '↑', 1: '→', 2: '↓', 3: '←'}
-    actual_policy = np.zeros((4, 12)).tolist()
-    for i in range(len(policy)):
-        row, col = revert_state_to_row_col(i)
-        actual_policy[row][col] = visual_help[policy[i]]
-    
-    for row in actual_policy:
-        print(" | ".join(row))
-
-
-def revert_state_to_row_col(state):
-    row = state // 12
-    col = state % 12
-    return row,col   
-
-def draw_rewards(rewards):
-    data = pd.DataFrame({'Episode': range(1, len(rewards) + 1), 'Reward': rewards})
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(x='Episode', y='Reward', data=data)
-
-    plt.title('Rewards Over Episodes')
-    plt.xlabel('Episode')
-    plt.ylabel('Reward')
-    plt.grid(True)
-    plt.tight_layout()
-
-    plt.show()
-
-
-class CustomFrozenLakeWrapper(gym.Wrapper):
-    def __init__(self, env):
-        super().__init__(env)
-    
-    def step(self, action):
-        state, reward, is_done, truncated, info = self.env.step(action)
+    def print_policy(self, policy):
+        visual_help = {0: '↑', 1: '→', 2: '↓', 3: '←'}
+        actual_policy = np.zeros((4, 12)).tolist()
+        for i in range(len(policy)):
+            row, col = self.revert_state_to_row_col(i)
+            actual_policy[row][col] = visual_help[policy[i]]
         
-        if state in [47]:
-            is_done = True
-        
-        return state, reward, is_done, is_done, info
+        for row in actual_policy:
+            print(" | ".join(row))
 
 
-env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
-env = CustomFrozenLakeWrapper(env)
+    def revert_state_to_row_col(self, state):
+        row = state // 12
+        col = state % 12
+        return row,col   
 
-GAMMA = 0.9999
-NUM_EPISODES = 200
-T_MAX = 100
+    def draw_rewards(self, rewards):
+        data = pd.DataFrame({'Episode': range(1, len(rewards) + 1), 'Reward': rewards})
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(x='Episode', y='Reward', data=data)
 
-agent = ValueIteration(env, gamma=GAMMA, num_episodes=NUM_EPISODES, t_max=T_MAX, reward_threshold=-20)
-rewards, max_diffs = agent.train()
+        plt.title('Rewards Over Episodes')
+        plt.xlabel('Episode')
+        plt.ylabel('Reward')
+        plt.grid(True)
+        plt.tight_layout()
 
-policy = agent.policy()
-print_policy(policy)
+        plt.show()
 
-draw_rewards(rewards)
+
