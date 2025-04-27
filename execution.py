@@ -4,12 +4,6 @@ import pandas as pd
 import os, csv
 import sys
 
-# Set UTF-8 encoding for output
-if sys.platform.startswith('win'):
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    os.environ["PYTHONIOENCODING"] = "utf-8"
-
 # Get the path to the virtual environment Python
 venv_python = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "Scripts", "python.exe")
 script = "experimentation.py"

@@ -5,3 +5,9 @@ q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-56.532,0.1961
 q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-56.586,0.5811
 q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-60.492,0.5104
 q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-53.876,0.9265
+q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-60.282,0.4954
+q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-54.6153,0.8439
+q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-63.264,0.4943
+q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-54.416,0.8632
+q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-62.076,0.4892
+q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-55.7287,0.8814
