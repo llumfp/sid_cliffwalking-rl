@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+from utils import revert_state_to_row_col, print_policy, draw_rewards, draw_history
 """ CliffWalking-v1"""
 
 
@@ -101,86 +102,55 @@ class ReinforceAgent:
             action_probabilities = self.policy_table[s]
             policy[s] = np.argmax(action_probabilities)
         return policy, self.policy_table
-    
-def draw_history(history, title, split=200):
-    average_rewards = [np.mean(history[i:i + split]) for i in range(0, len(history), split)]
-    std_rewards = [np.std(history[i:i + split]) for i in range(0, len(history), split)]
-    lower_bound = [avg - std for avg, std in zip(average_rewards, std_rewards)]
-    upper_bound = [avg + std for avg, std in zip(average_rewards, std_rewards)]
-    plt.figure(figsize=(10, 6))
-    plt.fill_between(range(1, len(average_rewards) + 1), lower_bound, upper_bound, color='b', alpha=0.2, label='±1 Std Dev')
-    plt.plot(range(1, len(average_rewards) + 1), average_rewards, marker='o', linestyle='-')
-    plt.title(f'Average {title} Every {split} Episodes')
-    plt.xlabel(f'Episode Group ({split} episodes each)')
-    plt.ylabel('Average ' + title)
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-    
-def print_policy(policy):
-    visual_help = {0: '↑', 1: '→', 2: '↓', 3: '←'}
-    actual_policy = np.zeros((4, 12)).tolist()
-    for i in range(len(policy)):
-        row, col = revert_state_to_row_col(i)
-        actual_policy[row][col] = visual_help[policy[i]]
-    
-    for row in actual_policy:
-        print(" | ".join(row))
 
 
-def revert_state_to_row_col(state):
-    row = state // 12
-    col = state % 12
-    return row,col   
+if __name__=='__main__':
+    # Declaración de constantes
+    SLIPPERY = True
+    # TRAINING_EPISODES = 15000
+    TRAINING_EPISODES = 15
+    GAMMA = 0.75
+    T_MAX = 400
+    LEARNING_RATE = 0.01
+    LEARNING_RATE_DECAY = 0.995
 
 
-# Declaración de constantes
-SLIPPERY = True
-TRAINING_EPISODES = 15000
-GAMMA = 0.75
-T_MAX = 400
-LEARNING_RATE = 0.01
-LEARNING_RATE_DECAY = 0.995
+    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+    #env = RewardWrapper(env)
 
+    agent = ReinforceAgent(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
+                        lr_decay=LEARNING_RATE_DECAY, seed=0, t_max=T_MAX)
+    rewards = []
+    losses = []
+    meta2 = 0
+    for i in range(TRAINING_EPISODES):
+        reward, loss, meta = agent.learn_from_episode()
+        meta2 += meta
+        policy, policy_table = agent.policy()
+        print(f"Last reward: {reward}, last loss: {loss}, new lr: {agent.learning_rate}. End of iteration [{i + 1}/{TRAINING_EPISODES}] - Meta: {1 if meta > 0 else 0}")
+        rewards.append(reward)
+        losses.append(loss)
+        
 
-env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
-#env = RewardWrapper(env)
+    print_policy(policy)
+    draw_history(rewards, "Reward")
+    draw_history(losses, "Loss")
 
-agent = ReinforceAgent(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
-                       lr_decay=LEARNING_RATE_DECAY, seed=0, t_max=T_MAX)
-rewards = []
-losses = []
-meta2 = 0
-for i in range(TRAINING_EPISODES):
-    reward, loss, meta = agent.learn_from_episode()
-    meta2 += meta
-    policy, policy_table = agent.policy()
-    print(f"Last reward: {reward}, last loss: {loss}, new lr: {agent.learning_rate}. End of iteration [{i + 1}/{TRAINING_EPISODES}] - Meta: {1 if meta > 0 else 0}")
-    rewards.append(reward)
-    losses.append(loss)
-    
+    """env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=True)
 
-print_policy(policy)
+    state, _ = env.reset()
+    done = False
+    step = 0
+    total_reward = 0
+    while not done and step < agent.T_MAX:
+        env.render()
+        action = agent.select_action(state, training=False)
+        next_state, reward, done, terminated, _ = env.step(action)
+        done = done or terminated
+        state = next_state
+        total_reward += reward
+        step += 1
+    env.close()
+    print(f"Total reward after rendering: {total_reward}")"""
 
-
-draw_history(rewards, "Reward")
-draw_history(losses, "Loss")
-
-"""env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=True)
-
-state, _ = env.reset()
-done = False
-step = 0
-total_reward = 0
-while not done and step < agent.T_MAX:
-    env.render()
-    action = agent.select_action(state, training=False)
-    next_state, reward, done, terminated, _ = env.step(action)
-    done = done or terminated
-    state = next_state
-    total_reward += reward
-    step += 1
-env.close()
-print(f"Total reward after rendering: {total_reward}")"""
-
-#draw_history(losses, "Loss")
+    #draw_history(losses, "Loss")

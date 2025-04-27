@@ -1,6 +1,6 @@
 # Cliff Walking with RL
 
-This project explores and compares different reinforcement learning algorithms on the slippery variant of the CliffWalking-v2 environment. The study analyzes performance based on various hyperparameters and training metrics. The goal is to evaluate the strengths and weaknesses of each approach in this kind of environment.
+This project explores and compares different reinforcement learning algorithms on the slippery variant of the CliffWalking-v0 environment. The study analyzes performance based on various hyperparameters and training metrics. The goal is to evaluate the strengths and weaknesses of each approach in this kind of environment.
 
 ## Project Structure
 
@@ -19,3 +19,4 @@ The project is organized as follows:
 ### Results (`/results`)
 - Storage for experimental results, metrics, and data
 
+## Execution

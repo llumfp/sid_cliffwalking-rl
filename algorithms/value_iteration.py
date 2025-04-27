@@ -104,34 +104,3 @@ class ValueIteration:
         
         return rewards, max_diffs
     
-    
-    def print_policy(self, policy):
-        visual_help = {0: '↑', 1: '→', 2: '↓', 3: '←'}
-        actual_policy = np.zeros((4, 12)).tolist()
-        for i in range(len(policy)):
-            row, col = self.revert_state_to_row_col(i)
-            actual_policy[row][col] = visual_help[policy[i]]
-        
-        for row in actual_policy:
-            print(" | ".join(row))
-
-
-    def revert_state_to_row_col(self, state):
-        row = state // 12
-        col = state % 12
-        return row,col   
-
-    def draw_rewards(self, rewards):
-        data = pd.DataFrame({'Episode': range(1, len(rewards) + 1), 'Reward': rewards})
-        plt.figure(figsize=(10, 6))
-        sns.lineplot(x='Episode', y='Reward', data=data)
-
-        plt.title('Rewards Over Episodes')
-        plt.xlabel('Episode')
-        plt.ylabel('Reward')
-        plt.grid(True)
-        plt.tight_layout()
-
-        plt.show()
-
-
