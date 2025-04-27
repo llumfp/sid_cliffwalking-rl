@@ -4,6 +4,10 @@ import csv, os
 import time
 from algorithms.utils import draw_rewards, revert_state_to_row_col, print_policy
 
+############################################################
+############### 1. Parameters configuration ################
+############################################################
+
 parser = argparse.ArgumentParser(description="Execution in the Cliff Walking environment.")
 parser.add_argument("--exp_id", type=float, help="ID from current experimentation parameters", default=0)
 parser.add_argument("--alg", type=str, choices=['q_learning','model_based', 'value_iteration'], 
@@ -30,6 +34,9 @@ print(f"Exploration Decay: {args.epsilon_decay}")
 print(f"Learning Rate: {args.lr}")
 print(f"Learning Rate Decay: {args.lr_decay}")
 
+############################################################
+############## 2. Output file initialization ###############
+############################################################
 
 # Create the output directory if it doesn't exist
 output_dir = "output"
@@ -42,9 +49,19 @@ if not os.path.exists(results_file):
         writer = csv.writer(f)
         writer.writerow([
             "exp_id","alg", "episodes", "gamma", "reward_signal", "epsilon", "epsilon_decay",
-            "lr", "lr_decay", "reward_train", "time"
+            "lr", "lr_decay", "reward_train", "reward_test", "time"
         ])
 
+############################################################
+################ 3. RL Agent initialization ################
+############################################################
+
+"""
+Agent needs to have:
+- train(num_episodes) method returning rewards
+- test(num_test_episodes) method returning rewards
+
+"""
 if args.alg == "q_learning":
     # Por el momento no aplicamos el decay del lr ni del epsilon
     from algorithms.q_learning import Qlearning
@@ -81,6 +98,11 @@ elif args.alg == "value_iteration":
 elif args.alg == "REINFORCE":
     pass    
 
+############################################################
+################### 4. RL Agent training ###################
+############################################################
+
+NUM_TEST_EPISODES = 20
 # Taining with the suitable agent
 start_time = time.time()
 # Training
@@ -92,7 +114,16 @@ policy = agent.policy()
 print_policy(policy)
 
 elapsed = time.time() - start_time
-avg_reward = sum(rewards_train) / len(rewards_train)
+avg_reward_train = sum(rewards_train) / len(rewards_train)
+
+############################################################
+################### 4. RL Agent testing ####################
+############################################################
+
+rewards_test = agent.test(NUM_TEST_EPISODES)
+avg_reward_test = sum(rewards_test) / len(rewards_test)
+
+draw_rewards(rewards_test, show=False, path=f'results/rewards_{args.alg}_{args.exp_id}_test.png')
 
 with open(results_file, mode='a', newline='') as file:
     writer = csv.writer(file)
@@ -106,6 +137,7 @@ with open(results_file, mode='a', newline='') as file:
         args.epsilon_decay,
         args.lr,
         args.lr_decay,
-        round(avg_reward, 4),
+        round(avg_reward_train, 4),
+        round(avg_reward_test, 4),
         round(elapsed, 4)
     ])
