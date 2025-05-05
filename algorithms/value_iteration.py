@@ -9,17 +9,23 @@ class ValueIteration:
     def __init__(self, env: gym.Env, gamma:float=0.9, num_episodes:int=1000, t_max:int=100, reward_threshold:float=-60):
         self.env = env
         self.V = np.zeros(self.env.observation_space.n)
-        self.V[47] = 10
         self.gamma = gamma
         self.num_episodes = num_episodes
         self.t_max = t_max
         self.reward_threshold = reward_threshold
-        self.terminal_state = [47]
+        
+        
         
     def calc_action_value(self, state, action):
         action_value = sum([prob * (reward + self.gamma * self.V[next_state])
                             for prob, next_state, reward, _ 
-                            in self.env.unwrapped.P[state][action]]) 
+                            in self.env.P[state][action]]) 
+        
+        action_value = 0
+        for prob, next_state, reward, _ in self.env.P[state][action]:
+            reward = reward if next_state != 47 else 0
+            action_value += prob * (reward + self.gamma * self.V[next_state])        
+        
         return action_value
 
     def select_action(self, state):
@@ -35,18 +41,19 @@ class ValueIteration:
     def value_iteration(self):
         max_diff = 0
         for state in range(self.env.observation_space.n):
-            if state in self.terminal_state:
-                continue
-
-            state_values = []
-            for action in range(self.env.action_space.n):  
-                state_values.append(self.calc_action_value(state, action))
-            new_V = max(state_values)
-            diff = abs(new_V - self.V[state])
-            if diff > max_diff:
-                max_diff = diff
-            self.V[state] = new_V
+                state_values = []
+                for action in range(self.env.action_space.n):  
+                    state_values.append(self.calc_action_value(state, action))
+                new_V = max(state_values)
+                diff = abs(new_V - self.V[state])
+                if diff > max_diff:
+                    max_diff = diff
+                self.V[state] = new_V
+            
         return self.V, max_diff
+    
+
+        #print(self.V.reshape((4, 12)))  # Ver la forma como una cuadrícula
     
     def policy(self):   
         policy = np.zeros(self.env.observation_space.n) 
@@ -80,7 +87,7 @@ class ValueIteration:
         
         init_time = time.time()
         
-        while not ready_to_compare or abs(max_diffs[-2] - max_diffs[-1]) > 0.01:
+        while not ready_to_compare or max_diffs[-1] > 0.05:
             _, max_diff = self.value_iteration()
             #print(f"Iteration {t}, max_diff = " + str(max_diff))
             max_diffs.append(max_diff)
@@ -104,3 +111,18 @@ class ValueIteration:
         
         return rewards, max_diffs
     
+
+from utils import CustomWrapper, print_policy, draw_rewards, draw_history
+
+env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+#env = gym.make("FrozenLake-v1", render_mode=None, is_slippery=False)
+#env = CustomWrapper(env)
+
+env = env.unwrapped
+
+agent = ValueIteration(env, gamma=0.995, num_episodes=50, t_max=50, reward_threshold=-20)
+rewards, max_diffs = agent.train()
+
+draw_history(rewards, "Reward")
+draw_history(max_diffs, "Max Diff")
+print_policy(agent.policy())

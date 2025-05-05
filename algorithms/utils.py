@@ -36,20 +36,20 @@ def draw_rewards(rewards, show=True, path = ""):
     else:
         plt.savefig(path)
 
-def draw_history(history, title, split=200):
-    average_rewards = [np.mean(history[i:i + split]) for i in range(0, len(history), split)]
-    std_rewards = [np.std(history[i:i + split]) for i in range(0, len(history), split)]
-    lower_bound = [avg - std for avg, std in zip(average_rewards, std_rewards)]
-    upper_bound = [avg + std for avg, std in zip(average_rewards, std_rewards)]
-    plt.figure(figsize=(10, 6))
-    plt.fill_between(range(1, len(average_rewards) + 1), lower_bound, upper_bound, color='b', alpha=0.2, label='±1 Std Dev')
-    plt.plot(range(1, len(average_rewards) + 1), average_rewards, marker='o', linestyle='-')
-    plt.title(f'Average {title} Every {split} Episodes')
-    plt.xlabel(f'Episode Group ({split} episodes each)')
-    plt.ylabel('Average ' + title)
-    plt.grid(True)
-    plt.tight_layout()
+def draw_history(history, title):
+    plt.figure(figsize=(10, 5))
+    plt.plot(moving_average(history), label=f"{title} promedio (ventana=50)")
+    plt.xlabel("Episodio")
+    plt.ylabel(title)
+    plt.title(title)
+    plt.grid()
+    plt.legend()
     plt.show()
+    
+def moving_average(x, w=50):
+    return np.convolve(x, np.ones(w)/w, mode='valid')
+
+
 
 
 class RewardWrapperFinal100(gym.RewardWrapper):
@@ -72,10 +72,14 @@ class CustomWrapper(gym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
     
-    def step(self, action):
+    def step(self, action):        
         state, reward, is_done, truncated, info = self.env.step(action)
         
         if state in [47]:
+            reward = 200
+            is_done = True
+            
+        if state == 36 and reward == -100:
             is_done = True
         
         return state, reward, is_done, is_done, info

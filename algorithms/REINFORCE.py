@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 from utils import revert_state_to_row_col, print_policy, draw_rewards, draw_history
+from utils import CustomWrapper
 """ CliffWalking-v1"""
 
 
@@ -79,22 +80,16 @@ class ReinforceAgent:
             action = self.select_action(state)
             next_state, reward, done, terminated, _ = self.env.step(action)
             #print(f"State: {state}, Action: {action}, Next State: {next_state}, Reward: {reward}, Done: {done}")
-            if reward != -1:
-                done = True
-                
-
-            done = done or terminated
-            #reward = reward if reward != -100 else -10
             episode.append((state, action, reward))
             state = next_state
             total_reward = total_reward + reward
-            step = step + 1
+            step += 1
             meta = meta + 1 if next_state == 47 else meta
             if done:
                 break
         loss = self.update_policy(zip(*episode))
         self.learning_rate = self.learning_rate * self.lr_decay if self.learning_rate > 0.0001 else self.learning_rate
-        return total_reward, loss, meta
+        return total_reward, loss, meta, len(episode)
 
     def policy(self):
         policy = np.zeros(self.env.observation_space.n)
@@ -107,24 +102,28 @@ class ReinforceAgent:
 if __name__=='__main__':
     # Declaración de constantes
     SLIPPERY = True
-    # TRAINING_EPISODES = 15000
-    TRAINING_EPISODES = 15
-    GAMMA = 0.75
-    T_MAX = 400
-    LEARNING_RATE = 0.01
-    LEARNING_RATE_DECAY = 0.995
+    
+    SLIPPERY = True
+    T_MAX = 50
+    NUM_EPISODES = 15000
+    GAMMA = 0.95
+    LEARNING_RATE = 0.1
+    LEARNING_RATE_DECAY = 0.9999
+    TRAINING_EPISODES = 10000
 
 
     env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
-    #env = RewardWrapper(env)
+    #env = CustomWrapper(env)
 
     agent = ReinforceAgent(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
                         lr_decay=LEARNING_RATE_DECAY, seed=0, t_max=T_MAX)
     rewards = []
     losses = []
+    length_episodes = []
     meta2 = 0
     for i in range(TRAINING_EPISODES):
-        reward, loss, meta = agent.learn_from_episode()
+        reward, loss, meta, length_episode = agent.learn_from_episode()
+        length_episodes.append(length_episode)
         meta2 += meta
         policy, policy_table = agent.policy()
         print(f"Last reward: {reward}, last loss: {loss}, new lr: {agent.learning_rate}. End of iteration [{i + 1}/{TRAINING_EPISODES}] - Meta: {1 if meta > 0 else 0}")
@@ -134,23 +133,4 @@ if __name__=='__main__':
 
     print_policy(policy)
     draw_history(rewards, "Reward")
-    draw_history(losses, "Loss")
-
-    """env = gym.make("CliffWalking-v0", render_mode="human", is_slippery=True)
-
-    state, _ = env.reset()
-    done = False
-    step = 0
-    total_reward = 0
-    while not done and step < agent.T_MAX:
-        env.render()
-        action = agent.select_action(state, training=False)
-        next_state, reward, done, terminated, _ = env.step(action)
-        done = done or terminated
-        state = next_state
-        total_reward += reward
-        step += 1
-    env.close()
-    print(f"Total reward after rendering: {total_reward}")"""
-
-    #draw_history(losses, "Loss")
+    draw_history(length_episodes, "Length of episodes")
