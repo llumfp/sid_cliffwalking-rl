@@ -1,3 +1,0 @@
-exp_id,alg,episodes,gamma,reward_signal,epsilon,epsilon_decay,lr,lr_decay,reward_train,reward_test,time
-q_learning,0.0,500,0.95,default,0.1,none,0.1,none,-59.502,-30.0,0.4336
-q_learning,1.0,1500,0.95,default,0.1,none,0.1,none,-54.7387,-30.0,0.8713

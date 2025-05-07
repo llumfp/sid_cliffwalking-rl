@@ -76,10 +76,7 @@ class CustomWrapper(gym.Wrapper):
         state, reward, is_done, truncated, info = self.env.step(action)
         
         if state in [47]:
-            reward = 200
-            is_done = True
-            
-        if state == 36 and reward == -100:
+            reward = 10
             is_done = True
         
-        return state, reward, is_done, is_done, info
+        return state, reward, is_done, truncated, info

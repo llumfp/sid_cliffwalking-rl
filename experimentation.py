@@ -1,5 +1,6 @@
 import argparse
 from execution import gym
+import numpy as np
 import csv, os
 import time
 from algorithms.utils import draw_rewards, revert_state_to_row_col, print_policy
@@ -10,8 +11,8 @@ from algorithms.utils import draw_rewards, revert_state_to_row_col, print_policy
 
 parser = argparse.ArgumentParser(description="Execution in the Cliff Walking environment.")
 parser.add_argument("--exp_id", type=float, help="ID from current experimentation parameters", default=0)
-parser.add_argument("--alg", type=str, choices=['q_learning','model_based', 'value_iteration'], 
-                    help="Algorithm to be used in the training: 'q_learning', 'model_based', or 'value_iteration'", default='q_learning')
+parser.add_argument("--alg", type=str, choices=['q_learning','model_based', 'value_iteration', 'REINFORCE', 'actor_critic'], 
+                    help="Algorithm to be used in the training: 'q_learning', 'model_based', 'value_iteration', 'REINFORCE' or 'actor_critic'", default='q_learning')
 parser.add_argument("--episodes", type=str, help="Number of episodes to train", default="1000")
 parser.add_argument("--gamma", type=float, help="Discount factor for training", default=0.99)
 parser.add_argument("--rew", type=str, help="Reward signal to use", default="default")
@@ -19,7 +20,7 @@ parser.add_argument("--epsilon", type=float, help="Exploration coefficient in Q-
 parser.add_argument("--epsilon_decay", type=str, choices=['none', 'linear', 'exponential'], 
                     help="Type of exploration decay in Q-Learning: 'none', 'linear', or 'exponential'", default='none')
 parser.add_argument("--lr", type=float, help="Learning rate in Q-Learning", default=0.1)
-parser.add_argument("--lr_decay", type=str, choices=['none', 'linear', 'exponential'],
+parser.add_argument("--lr_decay", type=str, #choices=['none', 'linear', 'exponential'],
                     help="Type of learning rate decay in Q-Learning: 'none', 'linear', or 'exponential'", default='none')
 
 args = parser.parse_args()
@@ -41,6 +42,10 @@ print(f"Learning Rate Decay: {args.lr_decay}")
 # Create the output directory if it doesn't exist
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
+os.makedirs(f"results/{args.alg}", exist_ok=True)
+os.makedirs(f"results/{args.alg}/train", exist_ok=True)
+os.makedirs(f"results/{args.alg}/test", exist_ok=True)
+
 
 # Create a CSV file to store the results
 results_file = os.path.join(output_dir, f"results_{args.alg}.csv")
@@ -49,7 +54,7 @@ if not os.path.exists(results_file):
         writer = csv.writer(f)
         writer.writerow([
             "exp_id","alg", "episodes", "gamma", "reward_signal", "epsilon", "epsilon_decay",
-            "lr", "lr_decay", "reward_train", "reward_test", "time"
+            "lr", "lr_decay", "reward_train", "reward_test", "time", "optimality"
         ])
 
 ############################################################
@@ -62,10 +67,13 @@ Agent needs to have:
 - test(num_test_episodes) method returning rewards
 
 """
+T_MAX = 100
+
+
+
 if args.alg == "q_learning":
     # Por el momento no aplicamos el decay del lr ni del epsilon
     from algorithms.q_learning import Qlearning
-    T_MAX = 30
 
     # Environment configuration
     env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
@@ -73,6 +81,7 @@ if args.alg == "q_learning":
         from algorithms.utils import RewardWrapperFinal100
         env = RewardWrapperFinal100(env)
     elif args.rew == "custom":
+        from algorithms.utils import CustomWrapper
         env = CustomWrapper(env)
     
     # Agent initialization
@@ -89,14 +98,44 @@ elif args.alg == "model_based":
 
 elif args.alg == "value_iteration":
     from algorithms.value_iteration import ValueIteration
-    from algorithms.utils import CustomWrapper
     env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
-    env = CustomWrapper(env)
-    agent = ValueIteration(env, gamma=args.disc, num_episodes=int(args.eps))
-    rewards, max_diffs = agent.train()
+    
+    if args.rew == "custom":
+        from algorithms.utils import CustomWrapper
+        env = CustomWrapper(env)
+        
+    agent = ValueIteration(env, 
+                           gamma=args.gamma, 
+                           t_max=T_MAX)
 
 elif args.alg == "REINFORCE":
-    pass    
+    from algorithms.REINFORCE import ReinforceAgent
+    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+    
+    if args.rew == "custom":
+        from algorithms.utils import CustomWrapper
+        env = CustomWrapper(env)
+        
+    agent = ReinforceAgent(env, 
+                           gamma=args.gamma, 
+                           learning_rate=args.lr,
+                           lr_decay=float(args.lr_decay), 
+                           seed=0, 
+                           t_max=T_MAX)
+
+elif args.alg == "actor_critic":
+    from algorithms.actor_critic import TabularActorCritic
+    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+    
+    if args.rew == "custom":
+        from algorithms.utils import CustomWrapper
+        env = CustomWrapper(env)
+        
+    agent = TabularActorCritic(env=env,
+                               alpha=args.lr, 
+                               beta=args.lr * 0.1, 
+                               gamma=args.gamma,
+                               t_max=T_MAX) 
 
 ############################################################
 ################### 4. RL Agent training ###################
@@ -107,10 +146,13 @@ NUM_TEST_EPISODES = 20
 start_time = time.time()
 # Training
 rewards_train = agent.train(int(args.episodes))
-draw_rewards(rewards_train, show=False, path=f'results/rewards_{args.alg}_{args.exp_id}.png')
+draw_rewards(rewards_train, show=False, path=f'results/{args.alg}/train/rewards_{args.exp_id}.png')
+
+from set_params import OPTIMAL_SOLUTION
+OPTIMAL_SOLUTION = np.array(OPTIMAL_SOLUTION)
 
 policy = agent.policy()
-
+optimality = np.sum(OPTIMAL_SOLUTION != policy.reshape(4, 12))
 print_policy(policy)
 
 elapsed = time.time() - start_time
@@ -123,7 +165,7 @@ avg_reward_train = sum(rewards_train) / len(rewards_train)
 rewards_test = agent.test(NUM_TEST_EPISODES)
 avg_reward_test = sum(rewards_test) / len(rewards_test)
 
-draw_rewards(rewards_test, show=False, path=f'results/rewards_{args.alg}_{args.exp_id}_test.png')
+draw_rewards(rewards_test, show=False, path=f"results/{args.alg}/test/rewards_{args.exp_id}.png")
 
 with open(results_file, mode='a', newline='') as file:
     writer = csv.writer(file)
@@ -139,5 +181,6 @@ with open(results_file, mode='a', newline='') as file:
         args.lr_decay,
         round(avg_reward_train, 4),
         round(avg_reward_test, 4),
-        round(elapsed, 4)
+        round(elapsed, 4),
+        optimality
     ])

@@ -76,38 +76,3 @@ class Qlearning:
             #     print(f"Episode {n_ep}: {sum(rewards[-500:-1])/len(rewards[-500:-1])} ")
             print(f"Episode {n_ep}: {rewards[-1]} ")
         return rewards
-    
-if __name__=='__main__':
-    from utils import RewardWrapperFinal100
-    SLIPPERY = True
-    T_MAX = 50
-    NUM_EPISODES = 15000
-    GAMMA = 0.95
-    REWARD_THRESHOLD = 0.9
-    LEARNING_RATE = 0.5
-    EPSILON = 0.8
-
-    # Crear el entorno CliffWalking-v0
-    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=SLIPPERY)
-
-    env = RewardWrapperFinal100(env)
-    # Inicializar agente Q-learning
-    agent = Qlearning(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
-                      epsilon=EPSILON, t_max=T_MAX)
-    
-    rewards = agent.train(NUM_EPISODES)
-
-    draw_rewards(rewards)
-
-    # # Test con render 
-    # env_test = gym.make("CliffWalking-v0", render_mode="human", is_slippery=SLIPPERY)
-    # agent.env = env_test  # reasignamos el entorno al agente
-    # rewards_test = agent.test(5)
-    # draw_rewards(rewards_test)
-
-    rewards = agent.test(20)
-
-    draw_rewards(rewards)
-
-    policy = agent.policy()
-    print_policy(policy)

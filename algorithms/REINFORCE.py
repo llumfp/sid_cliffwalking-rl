@@ -4,25 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-from utils import revert_state_to_row_col, print_policy, draw_rewards, draw_history
-from utils import CustomWrapper
 """ CliffWalking-v1"""
-
-
-class RewardWrapper(gym.RewardWrapper):
-    def __init__(self, env):
-        super().__init__(env)
-
-    def step(self, action):
-        state, reward, done, truncated, info = self.env.step(action)
-        reward = reward if state != 47 else 0
-        
-        if state in [37, 38, 39, 40, 41, 42, 43, 44, 45, 46]:
-            done = True
-        
-        return state, reward, done, done, info
-
-
 
 class ReinforceAgent:
     def __init__(self, env, gamma, learning_rate, lr_decay=1, seed=0, t_max =100):
@@ -75,62 +57,46 @@ class ReinforceAgent:
         done = False
         step = 0
         total_reward = 0
-        meta = 0
+
         while not done and step < self.T_MAX:
             action = self.select_action(state)
             next_state, reward, done, terminated, _ = self.env.step(action)
-            #print(f"State: {state}, Action: {action}, Next State: {next_state}, Reward: {reward}, Done: {done}")
             episode.append((state, action, reward))
             state = next_state
             total_reward = total_reward + reward
             step += 1
-            meta = meta + 1 if next_state == 47 else meta
             if done:
                 break
         loss = self.update_policy(zip(*episode))
-        self.learning_rate = self.learning_rate * self.lr_decay if self.learning_rate > 0.0001 else self.learning_rate
-        return total_reward, loss, meta, len(episode)
+        self.learning_rate = self.learning_rate * self.lr_decay
+        return total_reward, loss
 
     def policy(self):
         policy = np.zeros(self.env.observation_space.n)
         for s in range(self.env.observation_space.n):
             action_probabilities = self.policy_table[s]
             policy[s] = np.argmax(action_probabilities)
-        return policy, self.policy_table
-
-
-if __name__=='__main__':
-    # Declaración de constantes
-    SLIPPERY = True
+        return policy
     
-    SLIPPERY = True
-    T_MAX = 50
-    NUM_EPISODES = 15000
-    GAMMA = 0.95
-    LEARNING_RATE = 0.1
-    LEARNING_RATE_DECAY = 0.9999
-    TRAINING_EPISODES = 10000
-
-
-    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
-    #env = CustomWrapper(env)
-
-    agent = ReinforceAgent(env, gamma=GAMMA, learning_rate=LEARNING_RATE,
-                        lr_decay=LEARNING_RATE_DECAY, seed=0, t_max=T_MAX)
-    rewards = []
-    losses = []
-    length_episodes = []
-    meta2 = 0
-    for i in range(TRAINING_EPISODES):
-        reward, loss, meta, length_episode = agent.learn_from_episode()
-        length_episodes.append(length_episode)
-        meta2 += meta
-        policy, policy_table = agent.policy()
-        print(f"Last reward: {reward}, last loss: {loss}, new lr: {agent.learning_rate}. End of iteration [{i + 1}/{TRAINING_EPISODES}] - Meta: {1 if meta > 0 else 0}")
-        rewards.append(reward)
-        losses.append(loss)
-        
-
-    print_policy(policy)
-    draw_history(rewards, "Reward")
-    draw_history(length_episodes, "Length of episodes")
+    def train(self, num_episodes:int=1000): 
+        rewards = []
+        for i in range(num_episodes):
+            reward, loss = self.learn_from_episode()
+            rewards.append(reward)
+            print(f"Episode {i+1}/{num_episodes}, Reward: {reward}, Loss: {loss}, Learning Rate: {self.learning_rate}")
+        return rewards
+    
+    def test(self, num_episodes:int=1000):
+        rewards = []
+        for i in range(num_episodes):
+            total_reward = 0.0
+            state, _ = self.env.reset()
+            for i in range(self.T_MAX):
+                action = self.select_action(state, training=False)
+                new_state, new_reward, is_done, truncated, _ = self.env.step(action)
+                total_reward += new_reward
+                if is_done: 
+                    break
+                state = new_state
+            rewards.append(total_reward)
+        return rewards
