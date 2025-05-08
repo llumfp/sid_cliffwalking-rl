@@ -93,9 +93,6 @@ if args.alg == "q_learning":
                       epsilon_decay=args.epsilon_decay,
                       lr_decay=args.lr_decay)
 
-elif args.alg == "model_based":
-    pass
-
 elif args.alg == "value_iteration":
     from algorithms.value_iteration import ValueIteration
     env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
@@ -136,6 +133,18 @@ elif args.alg == "actor_critic":
                                beta=args.lr * 0.1, 
                                gamma=args.gamma,
                                t_max=T_MAX) 
+elif args.alg == "model_based":
+    from algorithms.model_based import ModelBased
+    env = gym.make("CliffWalking-v0", render_mode=None, is_slippery=True)
+    
+    if args.rew == "custom":
+        from algorithms.utils import CustomWrapper
+        env = CustomWrapper(env)
+    agent = ModelBased(env,
+                      gamma=args.gamma,
+                      num_trajectories=100,
+                      t_max=T_MAX,
+                      threshold=0.01)
 
 ############################################################
 ################### 4. RL Agent training ###################

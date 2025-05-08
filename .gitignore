@@ -3,3 +3,5 @@ venv/
 .venv/
 .vscode/
 __pycache__/
+output/
+results/
