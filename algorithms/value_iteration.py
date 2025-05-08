@@ -15,10 +15,11 @@ class ValueIteration:
         
         
         
+        
     def calc_action_value(self, state, action):
         action_value = sum([prob * (reward + self.gamma * self.V[next_state])
                             for prob, next_state, reward, _ 
-                            in self.env.P[state][action]])      
+                            in self.env.P[state][action]])   
         
         return action_value
 
@@ -45,10 +46,7 @@ class ValueIteration:
                 self.V[state] = new_V
             
         return self.V, max_diff
-    
-
-        #print(self.V.reshape((4, 12)))  # Ver la forma como una cuadrícula
-    
+        
     def policy(self):   
         policy = np.zeros(self.env.observation_space.n) 
         for s in range(self.env.observation_space.n):
@@ -87,7 +85,7 @@ class ValueIteration:
             reward_test = self.check_improvements()
             print(f"Iteration {t}, reward_test of {reward_test}, max_diff = " + str(max_diff))
             rewards.append(reward_test)
-                
+
             if reward_test > best_reward:
                 best_reward = reward_test
             

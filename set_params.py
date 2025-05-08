@@ -100,8 +100,6 @@ parametres_actor_critic = [
 
 PARAMETRES = parametres_value_iteration + parametres_actor_critic + parametres_reinforce + parametres_Q_learning  + parametres_model_based
 
-visual_help = {0: '^', 1: '>', 2: 'v', 3: '<'}
-
 
 OPTIMAL_SOLUTION = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],

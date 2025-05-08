@@ -146,7 +146,7 @@ NUM_TEST_EPISODES = 20
 start_time = time.time()
 # Training
 rewards_train = agent.train(int(args.episodes))
-draw_rewards(rewards_train, show=False, path=f'results/{args.alg}/train/rewards_{args.exp_id}.png')
+#draw_rewards(rewards_train, show=False, path=f'results/{args.alg}/train/rewards_{args.exp_id}.png')
 
 from set_params import OPTIMAL_SOLUTION
 OPTIMAL_SOLUTION = np.array(OPTIMAL_SOLUTION)
@@ -165,7 +165,7 @@ avg_reward_train = sum(rewards_train) / len(rewards_train)
 rewards_test = agent.test(NUM_TEST_EPISODES)
 avg_reward_test = sum(rewards_test) / len(rewards_test)
 
-draw_rewards(rewards_test, show=False, path=f"results/{args.alg}/test/rewards_{args.exp_id}.png")
+#draw_rewards(rewards_test, show=False, path=f"results/{args.alg}/test/rewards_{args.exp_id}.png")
 
 with open(results_file, mode='a', newline='') as file:
     writer = csv.writer(file)
