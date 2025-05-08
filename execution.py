@@ -1,3 +1,6 @@
+from utils import CreateVisualizations
+from set_params import PARAMETRES, ALGORITHMS, METRICS, CRITERIA_BEST_RESPONSE
+
 import subprocess
 import gymnasium as gym
 import pandas as pd
@@ -11,10 +14,7 @@ venv_python = "py"
 
 script = "experimentation.py"
 
-def experiment_sample():
-    # Import the parameters from the set_params module
-    from set_params import PARAMETRES
-    
+def experiment_sample():        
     # Execute the script sequentially with each parameter combination
     for ide, params in enumerate(PARAMETRES):
         # Build the execution command
@@ -33,6 +33,9 @@ def experiment_sample():
         print("Executing:", " ".join(cmd))
         # Execute the command
         subprocess.run(cmd)
+        
+    # Create visualizations for the results
+    CreateVisualizations(ALGORITHMS, METRICS, CRITERIA_BEST_RESPONSE)
 
 
 if __name__ == "__main__":

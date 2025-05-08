@@ -53,7 +53,7 @@ if not os.path.exists(results_file):
     with open(results_file, 'w', newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "exp_id","alg", "episodes", "gamma", "reward_signal", "epsilon", "epsilon_decay",
+            "alg", "exp_id", "episodes", "gamma", "reward_signal", "epsilon", "epsilon_decay",
             "lr", "lr_decay", "reward_train", "reward_test", "time", "optimality"
         ])
 

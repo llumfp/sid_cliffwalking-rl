@@ -1,10 +1,13 @@
-EPISODES = [500, 3000]
-GAMMA = [0.99, 0.5]
-EPSILON = [0.1, 0.3]
-LR = [0.1, 0.01]
+EPISODES = [500, 4000, 10000]
+GAMMA = [0.99, 0.75, 0.5, 0.25]
+EPSILON = [0.1, 0.3, 0.5, 0.8]
+LR = [0.1, 0.01, 0.001]
 LR_DECAY = [0.99, 0.5]
-REWARD_SIGNAL = ["custom", "custom"]
+REWARD_SIGNAL = ["default", "custom"]
 EPSILON_DECAY = ["none"] # "linear", "exponential"
+ALGORITHMS = ["q_learning", "value_iteration", "model_based", "REINFORCE", "actor_critic"]
+METRICS = ["reward_train", "reward_test", "optimality", "time"]
+CRITERIA_BEST_RESPONSE = ["reward_test", "optimality"]
 
 
 parametres_Q_learning = [
@@ -98,8 +101,7 @@ parametres_actor_critic = [
     ]
 
 
-PARAMETRES = parametres_value_iteration + parametres_actor_critic + parametres_reinforce + parametres_Q_learning  + parametres_model_based
-
+PARAMETRES = parametres_Q_learning #parametres_value_iteration + parametres_actor_critic + parametres_reinforce  + parametres_model_based # + parametres_Q_learning
 
 OPTIMAL_SOLUTION = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],

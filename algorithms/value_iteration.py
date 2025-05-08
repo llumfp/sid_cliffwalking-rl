@@ -17,7 +17,7 @@ class ValueIteration:
         
         
     def calc_action_value(self, state, action):
-        action_value = sum([prob * (reward + self.gamma * self.V[next_state])
+        action_value = sum([prob * ((reward if state != 47 else 0) + self.gamma * self.V[next_state])
                             for prob, next_state, reward, _ 
                             in self.env.P[state][action]])   
         
@@ -56,7 +56,7 @@ class ValueIteration:
     
     def check_improvements(self):
         reward_test = 0.0
-        for i in range(self.num_episodes):
+        for i in range(20):
             total_reward = 0.0
             state, _ = self.env.reset()
             for i in range(self.t_max):
@@ -67,7 +67,7 @@ class ValueIteration:
                     break
                 state = new_state
             reward_test += total_reward
-        reward_avg = reward_test / self.num_episodes
+        reward_avg = reward_test / 20
         return reward_avg
 
     def train(self, num_episodes:int=1000): 
@@ -77,7 +77,7 @@ class ValueIteration:
         best_reward = -1000
         ready_to_compare = False
                 
-        while t < self.t_max  and (not ready_to_compare or max_diffs[-1] > 0.1):
+        while not ready_to_compare or max_diffs[-1] > 0.05:
             _, max_diff = self.value_iteration()
             
             max_diffs.append(max_diff)

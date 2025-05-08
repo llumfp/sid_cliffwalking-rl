@@ -1,0 +1,5 @@
+exp_id,alg,episodes,gamma,reward_signal,epsilon,epsilon_decay,lr,lr_decay,reward_train,reward_test,time,optimality
+value_iteration,0.0,500,0.99,default,0.0,none,0.0,0,-71.0748,-70.25,2.3172,8
+REINFORCE,132.0,500,0.25,default,0.0,none,0.1,0.99,-110.614,-96.55,0.71,19
+actor_critic,49.0,4000,0.99,default,0.0,none,0.01,0,-87.1432,-82.45,6.912,6
+model_based,256.0,10000,0.99,default,0.0,none,0.0,0,-147.3965,-59.35,6.3682,4
