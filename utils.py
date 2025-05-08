@@ -57,7 +57,7 @@ def CreateVisualizations(algs: list, metrics:list, criteria: list) -> None:
         Bresponses.append(br)
 
         # Chenge the X-axis depending on the algorithm (each algorithm has different parameters)       
-        ejeX = ["gamma"] if alg in ["value_iteration", "model_based"] else ["gamma", "lr", "lr_decay"]
+        ejeX = ["gamma"] if alg in ["value_iteration", "model_based"] else ["gamma", "lr", "lr_decay"] if alg != "actor_critic" else ["gamma", "lr"]
         
         # Loop through each parameter in ejeX to create plots
         for X in ejeX:
@@ -76,11 +76,11 @@ def CreateVisualizations(algs: list, metrics:list, criteria: list) -> None:
                         for gamma in gammas:
                             data_gamma = data_subset[data_subset[X] == gamma]
                             data_gamma = data_gamma[data_gamma["episodes"] == n_episodes]
-                            mean_optimality = data_gamma[metric].mean() # mean of the metric (We use the mean to select the value, there is only one value for each combination of parameters)
+                            mean_optimality = data_gamma[metric].mean() # mean of the metric (We use the mean to select the value, there is only one value for each combination of parameters) (there are some cases that there are 3 or 6, but its bcs existance of more hyperparameters)
                             values.append(mean_optimality)
                         
                         # plot line and put the correct label
-                        ax.plot([i for i in range(len(gammas))], values, marker='o', label=f"{reward_signal.capitalize()} Line, Episodes: {n_episodes}")
+                        ax.plot([i for i in range(len(gammas))], values, marker='o', label=f"{reward_signal.capitalize()} Reward, Episodes: {n_episodes}")
 
                 # Set plot labels and title and save the plot
                 ax.set_xlabel(X)

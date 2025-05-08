@@ -5,7 +5,7 @@ LR = [0.1, 0.01, 0.001]
 LR_DECAY = [0.99, 0.5]
 REWARD_SIGNAL = ["default", "custom"]
 EPSILON_DECAY = ["none"] # "linear", "exponential"
-ALGORITHMS = ["q_learning", "value_iteration", "model_based", "REINFORCE", "actor_critic"]
+ALGORITHMS = ["actor_critic","value_iteration", "model_based", "REINFORCE", "actor_critic", "q_learning",]
 METRICS = ["reward_train", "reward_test", "optimality", "time"]
 CRITERIA_BEST_RESPONSE = ["reward_test", "optimality"]
 

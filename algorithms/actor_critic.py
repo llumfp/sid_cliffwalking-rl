@@ -43,8 +43,9 @@ class TabularActorCritic:
         for episode in range(num_episodes):
             state, _ = self.env.reset()
             total_reward = 0
-
-            for _ in range(self.t_max):
+            t = 0
+            
+            while t < self.t_max:
                 action = self.select_action(state)
                 next_state, reward, done, *info = self.env.step(action)
                 self.update(state, action, reward, next_state, done)
