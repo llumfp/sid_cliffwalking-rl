@@ -70,13 +70,14 @@ class RewardWrapperFinal100(gym.RewardWrapper):
 
 class CustomWrapper(gym.Wrapper):
     def __init__(self, env):
+        env.unwrapped.P[47] = {0: [(0.3333333333333333, np.int64(36), -100, False), (0.3333333333333333, np.int64(35), -1, False), (0.3333333333333333, np.int64(47), 0, True)], 1: [(0.3333333333333333, np.int64(35), -1, False), (0.3333333333333333, np.int64(47), 0, True), (0.3333333333333333, np.int64(47), 0, True)], 2: [(0.3333333333333333, np.int64(47), 0, True), (0.3333333333333333, np.int64(47), 0, True), (0.3333333333333333, np.int64(36), -100, False)], 3: [(0.3333333333333333, np.int64(47), 0, True), (0.3333333333333333, np.int64(36), -100, False), (0.3333333333333333, np.int64(35), -1, False)]}
         super().__init__(env)
     
     def step(self, action):        
         state, reward, is_done, truncated, info = self.env.step(action)
         
-        if state in [47]:
-            reward = 10
+        if state == 47:
+            reward = 0
             is_done = True
         
         return state, reward, is_done, truncated, info
