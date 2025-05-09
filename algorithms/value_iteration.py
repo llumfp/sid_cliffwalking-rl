@@ -17,7 +17,7 @@ class ValueIteration:
         
         
     def calc_action_value(self, state, action):
-        action_value = sum([prob * ((reward if state != 47 else 0) + self.gamma * self.V[next_state])
+        action_value = sum([prob * (reward + self.gamma * self.V[next_state])
                             for prob, next_state, reward, _ 
                             in self.env.P[state][action]])   
         
