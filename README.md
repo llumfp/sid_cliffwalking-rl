@@ -7,6 +7,7 @@ This project explores and compares different reinforcement learning algorithms o
 The project is organized as follows:
 
 ### Main Components
+- `REPORT.pdf`: Technical report comparing five reinforcement learning algorithms on the CliffWalking environment with experimental analysis.
 - `execution.py`: Main execution script for running the experiments. It has a loop for different parameter settings, execution script `experimentation.py` many times.
 - `experimentation.py`: Contains the experimentation setup and configuration for different parameters with argparse.
 - `set_params.py`: Script to define and manage parameter sets for experiments.
