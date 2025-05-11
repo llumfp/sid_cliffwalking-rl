@@ -3887,3 +3887,12 @@ q_learning,3884.0,10000,0.25,final_100,0.8,exponential,0.01,exponential,-172.464
 q_learning,3885.0,10000,0.25,final_100,0.8,exponential,0.001,none,-96.8707,-87.85,5.705,20
 q_learning,3886.0,10000,0.25,final_100,0.8,exponential,0.001,hyperbolic,-130.7805,-100.0,5.7938,22
 q_learning,3887.0,10000,0.25,final_100,0.8,exponential,0.001,exponential,-166.0319,-159.4,5.8909,27
+q_learning,0,10000,0.99,default,0.1,none,0.9,hyperbolic,-132.9232,-64.1,10.6291,9
+q_learning,0,10000,0.99,default,0.1,none,0.9,exponential,-190.7817,-119.8,13.4601,21
+q_learning,0,10000,0.99,default,0.1,none,0.9,none,-196.4504,-86.55,12.6489,16
+q_learning,0,10000,0.99,default,0.1,none,0.5,hyperbolic,-136.1143,-64.55,10.9752,6
+q_learning,0,10000,0.99,default,0.1,none,0.5,exponential,-190.5537,-109.9,13.3331,24
+q_learning,0,10000,0.99,default,0.1,none,0.5,none,-148.337,-85.6,11.7395,17
+q_learning,0,10000,0.99,default,0.1,none,0.1,hyperbolic,-152.1367,-84.85,12.5272,12
+q_learning,0,10000,0.99,default,0.1,none,0.1,exponential,-193.5595,-208.9,14.1925,29
+q_learning,0,10000,0.99,default,0.1,none,0.1,none,-128.7098,-58.75,10.186,7
