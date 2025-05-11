@@ -17,11 +17,11 @@ parser.add_argument("--episodes", type=str, help="Number of episodes to train", 
 parser.add_argument("--gamma", type=float, help="Discount factor for training", default=0.99)
 parser.add_argument("--rew", type=str, help="Reward signal to use", default="default")
 parser.add_argument("--epsilon", type=float, help="Exploration coefficient in Q-Learning", default=0.1)
-parser.add_argument("--epsilon_decay", type=str, choices=['none', 'linear', 'exponential'], 
-                    help="Type of exploration decay in Q-Learning: 'none', 'linear', or 'exponential'", default='none')
+parser.add_argument("--epsilon_decay", type=str, choices=['none', 'hyperbolic', 'exponential'], 
+                    help="Type of exploration decay in Q-Learning: 'none', 'hyperbolic', or 'exponential'", default='none')
 parser.add_argument("--lr", type=float, help="Learning rate in Q-Learning", default=0.1)
-parser.add_argument("--lr_decay", type=str, #choices=['none', 'linear', 'exponential'],
-                    help="Type of learning rate decay in Q-Learning: 'none', 'linear', or 'exponential'", default='none')
+parser.add_argument("--lr_decay", type=str, choices=['none', 'hyperbolic', 'exponential'],
+                    help="Type of learning rate decay in Q-Learning: 'none', 'hyperbolic', or 'exponential'", default='none')
 
 args = parser.parse_args()
 

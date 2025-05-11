@@ -2,9 +2,9 @@ EPISODES = [500, 4000, 10000]
 GAMMA = [0.99, 0.75, 0.5, 0.25]
 EPSILON = [0.1, 0.3, 0.5, 0.8]
 LR = [0.1, 0.01, 0.001]
-LR_DECAY = [0.99, 0.5]
-REWARD_SIGNAL = ["default", "custom"]
-EPSILON_DECAY = ["none"] # "linear", "exponential"
+LR_DECAY = ["none", "hyperbolic", "exponential"]
+REWARD_SIGNAL = ["default", "custom", "final_100"]
+EPSILON_DECAY = ["none", "hyperbolic", "exponential"]
 ALGORITHMS = ["actor_critic","value_iteration", "model_based", "REINFORCE", "actor_critic", "q_learning",]
 METRICS = ["reward_train", "reward_test", "optimality", "time"]
 CRITERIA_BEST_RESPONSE = ["reward_test", "optimality"]
@@ -16,7 +16,7 @@ parametres_Q_learning = [
             "episodes": str(episodes),
             "gamma": str(gamma),
             "epsilon": str(epsilon),
-            "epsilon_decay": "none",
+            "epsilon_decay": epsilon_decay,
             "reward_signal": reward_signal,
             "lr": str(lr),
             "lr_decay": lr_decay
@@ -24,7 +24,7 @@ parametres_Q_learning = [
         for episodes in EPISODES
         for gamma in GAMMA
         for epsilon in EPSILON
-        #for epsilon_decay in ["none", "linear", "exponential"]
+        for epsilon_decay in EPSILON_DECAY
         for reward_signal in REWARD_SIGNAL
         for lr in LR
         for lr_decay in LR_DECAY

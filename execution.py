@@ -14,7 +14,7 @@ venv_python = "py"
 
 script = "experimentation.py"
 
-def experiment_sample():        
+def experiment():        
     # Execute the script sequentially with each parameter combination
     for ide, params in enumerate(PARAMETRES):
         # Build the execution command
@@ -39,4 +39,4 @@ def experiment_sample():
 
 
 if __name__ == "__main__":
-    experiment_sample()
+    experiment()
