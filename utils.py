@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 
-def add_BestResponse(data:pd.DataFrame, criteria:list) -> pd.DataFrame:
+def add_BestResponse(data:pd.DataFrame, criteria:list, alg:bool = False) -> pd.DataFrame:
     """
     This function takes a DataFrame as input and returns the best response based on two criteria:
     1. The maximum value of the "reward_test" column.
@@ -24,6 +24,8 @@ def add_BestResponse(data:pd.DataFrame, criteria:list) -> pd.DataFrame:
             raise ValueError(f"Column '{i}' not found in the DataFrame.")
         
         if i == "reward_test":
+            if alg:
+                data = data[data["reward_signal"] == "default"]
             BRESPONSES.append(data.loc[data["reward_test"].idxmax()].to_frame().T)
         else:
             BRESPONSES.append(data.loc[data["optimality"].idxmin()].to_frame().T)
@@ -53,7 +55,7 @@ def CreateVisualizations(algs: list, metrics:list, criteria: list) -> None:
         data_custom = data[data["reward_signal"] == "custom"]
 
         # Get the best response of all the data
-        br = add_BestResponse(data, criteria)
+        br = add_BestResponse(data, criteria, alg= alg == "q_learning")
         Bresponses.append(br)
 
         # Chenge the X-axis depending on the algorithm (each algorithm has different parameters)       

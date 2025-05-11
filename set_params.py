@@ -30,6 +30,7 @@ parametres_Q_learning = [
         for lr_decay in LR_DECAY
     ]
 
+print(len(parametres_Q_learning))
 
 parametres_value_iteration = [
         {

@@ -14,7 +14,11 @@ venv_python = "py"
 
 script = "experimentation.py"
 
-def experiment():        
+def experiment():     
+    
+    CreateVisualizations(ALGORITHMS, METRICS, CRITERIA_BEST_RESPONSE)
+    raise ValueError("The function CreateVisualizations is not implemented yet.")
+       
     # Execute the script sequentially with each parameter combination
     for ide, params in enumerate(PARAMETRES):
         # Build the execution command
