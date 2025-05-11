@@ -9,6 +9,12 @@ ALGORITHMS = ["actor_critic","value_iteration", "model_based", "REINFORCE", "act
 METRICS = ["reward_train", "reward_test", "optimality", "time"]
 CRITERIA_BEST_RESPONSE = ["reward_test", "optimality"]
 
+OPTIMAL_SOLUTION = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+]
 
 parametres_Q_learning = [
         {
@@ -30,7 +36,6 @@ parametres_Q_learning = [
         for lr_decay in LR_DECAY
     ]
 
-print(len(parametres_Q_learning))
 
 parametres_value_iteration = [
         {
@@ -102,11 +107,6 @@ parametres_actor_critic = [
     ]
 
 
-PARAMETRES = parametres_Q_learning #parametres_value_iteration + parametres_actor_critic + parametres_reinforce  + parametres_model_based # + parametres_Q_learning
+PARAMETRES = parametres_value_iteration + parametres_actor_critic + parametres_reinforce  + parametres_model_based  + parametres_Q_learning
 
-OPTIMAL_SOLUTION = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-]
+

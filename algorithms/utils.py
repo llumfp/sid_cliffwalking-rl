@@ -4,13 +4,29 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-def revert_state_to_row_col(state):
+def revert_state_to_row_col(state:int) -> tuple[int, int]:
+    """
+    Convert a state number to its corresponding row and column in a 4x12 grid.
+
+    Args:
+        state (int): The state number to convert.
+
+    Returns:
+        tuple[int, int]: The row and column corresponding to the state number.
+    """
+    
     row = state // 12
     col = state % 12
     return row,col  
 
-def print_policy(policy):
-    # Using ASCII characters instead of Unicode arrows
+def print_policy(policy: list[int]) -> None:
+    """
+    Print the policy in a human-readable format.
+
+    Args:
+        policy (list[int]): The policy to print, represented as a list of integers.
+    """
+
     visual_help = {0: '^', 1: '>', 2: 'v', 3: '<'}
     actual_policy = np.zeros((4, 12)).tolist()
     for i in range(len(policy)):
@@ -20,7 +36,15 @@ def print_policy(policy):
     for row in actual_policy:
         print(" | ".join(row))
  
-def draw_rewards(rewards, show=True, path = ""):
+def draw_rewards(rewards:list[int], show:bool=True, path:str = "") -> None:
+    """
+    Draw a line plot of rewards over episodes.
+
+    Args:
+        rewards (list[int]): List of rewards to plot.
+        show (bool, optional): Show the plot or not. Defaults to True.
+        path (str, optional): The path to save the figure. Defaults to "".
+    """
     data = pd.DataFrame({'Episode': range(1, len(rewards) + 1), 'Reward': rewards})
     plt.figure(figsize=(10, 6))
     sns.lineplot(x='Episode', y='Reward', data=data)
@@ -36,7 +60,14 @@ def draw_rewards(rewards, show=True, path = ""):
     else:
         plt.savefig(path)
 
-def draw_history(history, title):
+def draw_history(history:list[int], title:str) -> None:
+    """
+    Draw a line plot of the moving average of a list of numbers.
+
+    Args:
+        history (list[int]): List of numbers to plot.
+        title (str): Title of the plot.
+    """
     plt.figure(figsize=(10, 5))
     plt.plot(moving_average(history), label=f"{title} promedio (ventana=50)")
     plt.xlabel("Episodio")
@@ -46,7 +77,18 @@ def draw_history(history, title):
     plt.legend()
     plt.show()
     
-def moving_average(x, w=50):
+def moving_average(x:list[int], w=50) -> np.ndarray:
+    """
+    Calculate the moving average of a list of numbers.
+
+    Args:
+        x (list[int]): List of numbers to calculate the moving average.
+        w (int, optional): Moving average. Defaults to 50.
+
+    Returns:
+        np.ndarray: The moving average of the input list.
+    """
+    
     return np.convolve(x, np.ones(w)/w, mode='valid')
 
 

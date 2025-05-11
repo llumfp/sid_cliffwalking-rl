@@ -42,9 +42,9 @@ print(f"Learning Rate Decay: {args.lr_decay}")
 # Create the output directory if it doesn't exist
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
-os.makedirs(f"results/{args.alg}", exist_ok=True)
+"""os.makedirs(f"results/{args.alg}", exist_ok=True)
 os.makedirs(f"results/{args.alg}/train", exist_ok=True)
-os.makedirs(f"results/{args.alg}/test", exist_ok=True)
+os.makedirs(f"results/{args.alg}/test", exist_ok=True)"""
 
 
 # Create a CSV file to store the results
@@ -142,7 +142,7 @@ elif args.alg == "model_based":
         env = CustomWrapper(env)
     agent = ModelBased(env,
                       gamma=args.gamma,
-                      num_trajectories=100,
+                      num_trajectories=int(args.episodes),
                       t_max=T_MAX,
                       threshold=0.01)
 
